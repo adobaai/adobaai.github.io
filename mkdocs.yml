@@ -1,0 +1,30 @@
+site_name: Adoba Open Docs
+theme:
+  name: material
+  favicon: shoe-prints-solid.svg
+  icon:
+    logo: fontawesome/solid/shoe-prints
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: amber
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - header.autohide
+    - navigation.tabs
+
+repo_url: https://github.com/adobaai/adobaai.github.io
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/adobaai
