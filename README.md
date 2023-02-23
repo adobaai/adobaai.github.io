@@ -1,2 +1,4 @@
 # adobaai.github.io
-Adoba open docs
+
+Adoba Open Docs site: https://adobaai.github.io/,
+made with [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/).
