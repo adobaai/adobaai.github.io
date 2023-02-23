@@ -28,3 +28,7 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/adobaai
+
+markdown_extensions:
+  # Fix https://github.com/mkdocs/mkdocs/issues/545
+  - mdx_truly_sane_lists
