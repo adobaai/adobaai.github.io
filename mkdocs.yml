@@ -19,6 +19,7 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
   features:
+    - content.code.copy
     - header.autohide
     - navigation.tabs
 
@@ -30,5 +31,10 @@ extra:
       link: https://github.com/adobaai
 
 markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      auto_title: true
+      linenums: true
+  - pymdownx.superfences 
   # Fix https://github.com/mkdocs/mkdocs/issues/545
   - mdx_truly_sane_lists
