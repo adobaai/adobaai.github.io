@@ -1,0 +1,19 @@
+<!-- Use `sourcemd` instead of `source.md`, as MkDocs will treat it as a doc file. -->
+
+## SVG
+
+All SVGs are formatted by vscode plugins: jock.svg
+
+Many SVGs are downloaded directly from the following two sites:
+
+1. https://www.svgrepo.com/
+2. https://iconduck.com/
+
+And the following are from their official website:
+
+- [apisix.svg](https://apisix.apache.org/zh/img/logo2.svg)
+- [etcd.svg](https://cncf-branding.netlify.app/img/projects/etcd/icon/color/etcd-icon-color.svg)
+- [grafana.svg](https://grafana.com/static/img/menu/grafana2.svg)
+- [loki.svg](https://grafana.com/static/img/logos/logo-loki.svg)
+- [netmaker.svg](https://uploads-ssl.webflow.com/623390d5ead4650d9c03f969/623390d5ead465992403f995_netmaker-logo-white.svg)
+- [uptrace.svg](https://uptrace.dev/img/logo-small.svg)
