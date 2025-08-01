@@ -1,0 +1,1495 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../exploring-our-technology-stack-backend/">
+      
+      
+        <link rel="next" href="../yezhoushusuojian/">
+      
+      
+      <link rel="icon" href="../../shoe-prints-solid.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
+    
+    
+      
+        <title>Reflections on Designing a Wallet Service - Adoba Open Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.7e37652d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="amber" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#reflections-on-designing-a-wallet-service" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Adoba Open Docs" class="md-header__button md-logo" aria-label="Adoba Open Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M296 192c-21.1-12.1-42.3-24.2-72-29.3V22.4C257.7 13 311.4 0 352 0c96 0 224 48 224 128s-119.6 96-176 96c-48 0-76-16-104-32M128 32h48v128h-48c-35.3 0-64-28.7-64-64s28.7-64 64-64m104 288c28-16 56-32 104-32 56.4 0 176 16 176 96S384 512 288 512c-40.5 0-94.3-13-128-22.4V349.3c29.7-5.2 50.9-17.3 72-29.4zM64 480c-35.3 0-64-28.7-64-64s28.7-64 64-64h48v128z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Adoba Open Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Reflections on Designing a Wallet Service
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="amber" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/adobaai/adobaai.github.io" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Welcome
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../20250728-egg-ai-intro/" class="md-tabs__link">
+          
+  
+  
+  Backend
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../blog/" class="md-tabs__link">
+          
+  
+  
+  Blog
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Adoba Open Docs" class="md-nav__button md-logo" aria-label="Adoba Open Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M296 192c-21.1-12.1-42.3-24.2-72-29.3V22.4C257.7 13 311.4 0 352 0c96 0 224 48 224 128s-119.6 96-176 96c-48 0-76-16-104-32M128 32h48v128h-48c-35.3 0-64-28.7-64-64s28.7-64 64-64m104 288c28-16 56-32 104-32 56.4 0 176 16 176 96S384 512 288 512c-40.5 0-94.3-13-128-22.4V349.3c29.7-5.2 50.9-17.3 72-29.4zM64 480c-35.3 0-64-28.7-64-64s28.7-64 64-64h48v128z"/></svg>
+
+    </a>
+    Adoba Open Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/adobaai/adobaai.github.io" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Welcome
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Backend
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Backend
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../20250728-egg-ai-intro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    EGG AI Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../a-case-study-of-mysql-timezones/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    A case study of MySQL timezones
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Ai for adobaro
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exploring-our-technology-stack-backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Exploring Our Technology Stack
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Reflections on Designing a Wallet Service
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Reflections on Designing a Wallet Service
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#preface" class="md-nav__link">
+    <span class="md-ellipsis">
+      Preface
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#microscopic-view" class="md-nav__link">
+    <span class="md-ellipsis">
+      Microscopic view
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Microscopic view">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#floating-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      Floating Point
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rounding" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rounding
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#currency-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Currency code
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#currency-max-amount" class="md-nav__link">
+    <span class="md-ellipsis">
+      Currency max amount
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#currency-decimal-digits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Currency decimal digits
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data types
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#macroscopic-view" class="md-nav__link">
+    <span class="md-ellipsis">
+      Macroscopic view
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Macroscopic view">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Code
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unit-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      Unit test
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transaction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transaction
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk control
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extended-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      Extended Reading
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../yezhoushusuojian/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    舟夜书所见
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Blog
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Blog
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Blog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Archive
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blog/archive/2024/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2024
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blog/archive/2023/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2023
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Categories
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blog/category/backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Backend
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blog/category/container/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Container
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blog/category/database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Database
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blog/category/devops/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    DevOps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blog/category/event-driven/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Event-Driven
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blog/category/golang/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Golang
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#preface" class="md-nav__link">
+    <span class="md-ellipsis">
+      Preface
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#microscopic-view" class="md-nav__link">
+    <span class="md-ellipsis">
+      Microscopic view
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Microscopic view">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#floating-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      Floating Point
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rounding" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rounding
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#currency-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Currency code
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#currency-max-amount" class="md-nav__link">
+    <span class="md-ellipsis">
+      Currency max amount
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#currency-decimal-digits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Currency decimal digits
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data types
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#macroscopic-view" class="md-nav__link">
+    <span class="md-ellipsis">
+      Macroscopic view
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Macroscopic view">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Code
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unit-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      Unit test
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transaction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transaction
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      Risk control
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extended-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      Extended Reading
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="reflections-on-designing-a-wallet-service">Reflections on Designing a Wallet Service</h1>
+<h2 id="preface">Preface</h2>
+<p>此文主要是我们在设计钱包服务时的一些经验总结, 包括:</p>
+<ol>
+<li>细节方面的浮点数, 舍入, 金额的数据类型等</li>
+<li>宏观方面的代码质量, 单测, 风控等</li>
+</ol>
+<p>此项目的难点在于两个方面:</p>
+<ol>
+<li>对数据一致性的要求, 钱多了钱少了都是大问题</li>
+<li>系统面向的是全球用户, 每个国家的币种, 汇率等都不一样, 如何在系统中统一表示</li>
+</ol>
+<p>其实对于我们这样的小公司来说, 很多东西到不用考虑这么仔细, 但个人设计软件不喜欢有不清楚的地方,
+所有的模糊的地方都必须搞明白, 这样才能提高软件的健壮性.
+但是对于大公司来说, 细节是必须的, 毕竟一出问题就很严重,
+对于一个需要运行很多年的银行系统来说, 这一点更为重要.</p>
+<p>一些例子:</p>
+<p>https://qr.ae/pr9I8r :</p>
+<blockquote>
+<p>As a Brazilian you might remember our inflation days
+when we need to change parts of accoing and other systems in days.</p>
+</blockquote>
+<p>https://web.archive.org/web/20200920054816/https://status.aws.amazon.com/s3-20080720.html:</p>
+<blockquote>
+<p>More specifically, we found that there were a handful of messages on Sunday morning
+that had a single bit corrupted such that the message was still intelligible,
+but the system state information was incorrect.</p>
+</blockquote>
+<h2 id="microscopic-view">Microscopic view</h2>
+<h3 id="floating-point">Floating Point</h3>
+<p>我们先来看一下例子:</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Go</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1">1</a></span>
+<span class="normal"><a href="#__codelineno-0-2">2</a></span>
+<span class="normal"><a href="#__codelineno-0-3">3</a></span>
+<span class="normal"><a href="#__codelineno-0-4">4</a></span>
+<span class="normal"><a href="#__codelineno-0-5">5</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">ExampleFloatingPoint</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="w">    </span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mf">1.1</span><span class="p">,</span><span class="w"> </span><span class="mf">2.2</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">b</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="w">    </span><span class="c1">// Output: 3.3000000000000003</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+<p>因为浮点数在计算机里面是近似表示的, 不是完全表示, 为什么会这么设计?
+应该是为了效率吧, 毕竟上个世纪的电脑的性能跟现在比实在是天差地别.</p>
+<p>我有一个猜想, 在进行小数字的计算的时候, 比如几亿以内的加减运算,
+我们进行舍入的话应该能去掉这个误差,
+一是我们能够确保小数点后面的精确位数是固定的, 毕竟货币都有最小单位.
+二是两个数加减的误差应该是有个范围的, 根据浮点数的原理, 我们可以推导出误差的最大值,
+如果误差在允许范围内, 那这样就是没有问题的.</p>
+<h3 id="rounding">Rounding</h3>
+<p>在进行税额, 服务费, 货币转换的计算时, 肯定会出现小于最小货币单位的金额,
+这时候就需要进行舍入了. 至于怎么舍入, 就属于业务的范畴了.
+钱的总额是不会变的, 要么用户多得利一点, 要么公司多得利一点,
+要么用一种分布比较均匀的公平算法, 如四舍六入五成双法.</p>
+<p>扩展阅读:</p>
+<ol>
+<li><a href="https://www.zhihu.com/question/24580446/answer/640291950">银行如何处理数据精度的，四舍五入是否有必要在银行系统中存在？ - 尚道的回答 - 知乎</a></li>
+<li><a href="https://cloud.tencent.com/developer/article/1829858">金融系统如果产生多余两位小数位的金额怎么办？ - 腾讯云开发者社区-腾讯云</a></li>
+</ol>
+<h3 id="currency-code">Currency code</h3>
+<p>货币代码一般为三个字母, 再加三个字母的冗余, 因此最大长度设为 <code>6</code>.</p>
+<p>参考 https://en.wikipedia.org/wiki/ISO_4217 :</p>
+<blockquote>
+<p>At the 17th session (February 1978), the related UN/ECE Group of Experts agreed that
+the <strong>three-letter</strong> alphabetic codes for International Standard ISO 4217</p>
+</blockquote>
+<p>货币代码列表也可参考: https://www.iban.com/currency-codes</p>
+<h3 id="currency-max-amount">Currency max amount</h3>
+<p>对于一些币值很小的货币, 如越南盾, 津巴布韦元, 需要考虑汇率换算之后的膨胀问题,
+比如说假设人民币兑越南盾 1:3000, 换算成越南盾之后就膨胀了 3000 倍.</p>
+<p>举个例子: 每个博主每月收入 10 万人民币, 有 1000 个达人, 每月总收入 1 亿,
+一年 12 亿, 换算成某种不值钱的货币是 120000 亿 (<code>12000000000000</code>, 一共 14 位),
+一不小心就会溢出. 所以这也是不能用浮点数的原因之一, 小数字可以进行舍去,
+大数字就是真的表示不了那么精确的值.</p>
+<h3 id="currency-decimal-digits">Currency decimal digits</h3>
+<p>实际上我们不必考虑金额的小数位数, 因为我们所用的整个技术栈都支持任意精度的小数,
+以 PostgreSQL 的 numberic 类型为例<a href="https://www.postgresql.org/docs/current/datatype-numeric.html">^1</a>:</p>
+<blockquote>
+<p>up to 131072 digits before the decimal point;
+up to 16383 digits after the decimal point</p>
+</blockquote>
+<p>但是基于性能上的考量或者防御式编程, 我们最好还是限制一下位数.</p>
+<p>货币的基本单位和最小单位在很多国家都是不一样的,
+比如中国的基本单位是元, 最小单位是角 (小数点后两位), 美国的美元也是一样的,
+但是日本就只有日元一个单位.
+在存储金额时, 为了简化计算流程, 我们都会选择直接存储基本单位而不是最小单位,
+所以我们需要确定金额小数点后最多能有多少位数字.</p>
+<p>参考 https://en.wikipedia.org/wiki/ISO_4217 , 最多小数位数的是 4, 有如下国家:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Num</th>
+<th>Digits</th>
+<th>Currency</th>
+<th>Locations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLF</td>
+<td>990</td>
+<td>4</td>
+<td>Unidad de Fomento (funds code)</td>
+<td>Chile</td>
+</tr>
+<tr>
+<td>UYW</td>
+<td>927</td>
+<td>4</td>
+<td>Unidad previsional</td>
+<td>Uruguay</td>
+</tr>
+</tbody>
+</table>
+<p>再加两个数字冗余, 最后我们选择了 6 位小数.</p>
+<h3 id="data-types">Data types</h3>
+<p>因为浮点数的精度问题, 所以需要换种数据类型:</p>
+<ul>
+<li>ProtoBuf: <code>double</code><ul>
+<li>pb 没有 <code>decimal</code> 类型, 所以只能用 <code>double</code></li>
+<li>pb 主要负责扔给前端显示, 不用计算 (加减乘除) 所以就不用担心精度问题</li>
+<li>其实用 <code>string</code> 类型也是可以的, 只是后端这边多额外判断一下 API 传入的字符串是否正确.</li>
+</ul>
+</li>
+<li>Golang: <code>Decimal</code><ul>
+<li>使用的库是 <a href="https://github.com/shopspring/decimal">shopspring/decimal</a></li>
+</ul>
+</li>
+<li>Postgres: <code>numeric(19, 6)</code><ul>
+<li>支持小数点后六位, 一共 19 位数字</li>
+<li>最大值: 9999999999999.999999, 九万亿, 这应该足够了吧</li>
+</ul>
+</li>
+<li>Exchange Rate: <code>double</code><ul>
+<li>汇率使用 64 位浮点数, 有 16 位有效数字 (float32 只有 7 位)</li>
+<li>这里感觉该使用 <code>decimal</code> 的, 统一类型, 代码也要简洁点</li>
+</ul>
+</li>
+<li>关于 <a href="https://github.com/shopspring/decimal">shopspring/decimal</a>:<ul>
+<li>支持的数据库类型有 <code>float32</code>, <code>float64</code>, <code>int64</code>, <code>string</code>,
+  See <a href="https://github.com/shopspring/decimal/blob/f55dd564545cec84cf84f7a53fb3025cdbec1c4f/decimal.go#L1392">code</a></li>
+</ul>
+</li>
+</ul>
+<p>扩展阅读:</p>
+<ol>
+<li><a href="https://www.v2ex.com/t/199222">储存价格的字段，单位用元还是分好 - V2EX</a></li>
+<li><a href="https://www.v2ex.com/t/634439">大家平常都是以什么类型存储货币类型的数据？ - V2EX</a></li>
+<li><a href="https://www.v2ex.com/t/647058">准备开发和钱有关的功能，还有哪些地方要注意 - V2EX</a></li>
+<li><a href="https://www.v2ex.com/t/683167">涉及金钱存储或计算操作时，你们一般都使用什么数据类型 - V2EX</a></li>
+<li><a href="https://www.zhihu.com/question/22536323/answer/348288089">银行系统中对于「金额」使用怎样的数据类型？ - 沈万马的回答 - 知乎</a></li>
+</ol>
+<h2 id="macroscopic-view">Macroscopic view</h2>
+<h3 id="code">Code</h3>
+<p>想要提升代码质量,
+一从人的角度上考虑:
+要求程序员的思维足够严谨, 考虑到各种情况, 最好能举一反三,
+由一种情况联想到另外一种情况. 在写 <code>if</code>, <code>switch</code> 语句的时候,
+就尽量把所有分支情况都处理了, 虽然说有些分支目前来说不太可能会遇到,
+但是说不定在未来某次迭代的时候这个分支就遇到了, 在未来你可能也忘记了还有这个分支,
+这种情况非常常见, 一是没考虑到, 二是需求太急了没时间考虑.
+我们提前处理好, 就提前阻止了系统进入一个无法预知情况的发生, 这也算是防御式编程吧.</p>
+<p>二从工具角度上考虑:
+使用拥有强大类型系统的语言, 编写完整的单元测试, lint 规则以及 CI/CD 流水线.
+人多多少少会犯错, 使用工具能让我们避免低级错误, 在团队中也能使大家保持一致的代码风格等等.
+以最近大火的 Rust 语言为例,
+依靠强大的类型系统以及严苛的编程规范来强制程序员写出高质量的代码,
+虽然这种语言的门槛比较高, 但是有舍有得.
+我们团队使用的是 Golang, 虽然类型系统相较于其他一些语言 (Rust, Haskell...) 比较弱鸡,
+但是作为一门简单好上手的静态编译语言, 结合一些 lint 工具 (如 <a href="https://golangci-lint.run/">golangci-lint</a>),
+开发体验还是挺不错的.</p>
+<p>最后, 工具只是辅助, 优秀的程序员应该采用最简单直接的方式解决问题,
+而不是像初级程序员一样绕来绕去.</p>
+<h3 id="unit-test">Unit test</h3>
+<p>单测: 这其实属于 Code 的一部分</p>
+<p>重要的代码肯定要要求单测覆盖率的, 就不赘述了.</p>
+<h3 id="transaction">Transaction</h3>
+<p>钱包系统就可以算是事务使用的典型场景了, 要保证数据的强一致性就肯定得用到事务, 具体来说:
+在设计余额表的时候, 一般都会有一张余额流水表, 以记录余额变化的情况,
+以及对应余额变化的业务表, 如提现就会对应一张提现表, 一次提现申请就会涉及到三张表的修改.</p>
+<h3 id="risk-control">Risk control</h3>
+<p>主要是异常监控, 复杂的风控以目前公司的技术实力还不行, 也没有必要.
+参考墨菲定律, 大概率会发生各种异常情况, 比如异常的提现状态,
+几张关联表的金额不一致等情况.
+简单的实现就是: 定时任务 + SQL, 复杂的就参考下面:</p>
+<ul>
+<li><a href="https://github.com/WalterInSH/risk-management-note">GitHub - WalterInSH/risk-management-note: 🧯 风险控制笔记，适用于互联网企业</a></li>
+<li><a href="https://www.v2ex.com/t/866050">一般的风控系统能识别到哪些客户端风险？ - V2EX</a></li>
+</ul>
+<h2 id="extended-reading">Extended Reading</h2>
+<ol>
+<li>🌟 <a href="https://www.51cto.com/article/707378.html">大流量活动下钱包提现方案的设计与实现-51CTO.COM</a><ul>
+<li>什么叫无懈可击的流程, 这就是</li>
+</ul>
+</li>
+<li><a href="https://bbs.huaweicloud.com/blogs/352998">基于 DDD 的虚拟钱包系统设计-云社区-华为云</a></li>
+<li><a href="https://www.woshipm.com/pd/3905325.html">提现业务的整套设计与流程，你都掌握了么？ | 人人都是产品经理</a></li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/adobaai" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.copy", "header.autohide", "navigation.tabs"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.50899def.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,139 @@
+# Refer https://github.com/terrastruct/d2/blob/master/docs/examples/twitter/in.d2
+
+# Shapes
+
+APISIX: {
+  icon: apisix.svg
+  shape: image
+}
+
+Microservices: {
+  user
+  video
+  wallet
+  strand
+  etc
+}
+
+Databases: {
+  MySQL: {
+    icon: mysql.svg
+    shape: image
+  }
+  Postgres: {
+    icon: postgresql.svg
+    shape: image
+  }
+  Redis: {
+    icon: redis.svg
+    shape: image
+  }
+  InfluxDB: {
+    icon: influxdb.svg
+    shape: image
+  }
+}
+
+etcd: {
+  icon: etcd.svg
+  shape: image
+}
+
+Grafana: {
+  icon: grafana.svg
+  shape: image
+}
+
+Loki: {
+  icon: loki.svg
+  shape: image
+}
+
+Uptrace: {
+  icon: uptrace.svg
+  shape: image
+}
+
+Netmaker: {
+  icon: netmaker.svg
+  shape: image
+}
+
+CircleCI: {
+  icon: circleci.svg
+  shape: image
+}
+
+Developer: {
+  icon: developer.svg
+  shape: image
+}
+
+Dev network: {
+  icon: dev-network.svg
+  shape: image
+}
+
+GitHub: {
+  icon: github.svg
+  shape: image
+}
+
+User: {
+  icon: user.svg
+  shape: image
+}
+
+Web: {
+  icon: web.svg
+  shape: image
+}
+
+Mobile: {
+  icon: mobile.svg
+  shape: image
+}
+
+Desktop: {
+  icon: desktop.svg
+  shape: image
+}
+
+# Connections
+
+APISIX -> Microservices
+APISIX -> etcd: Retereive config
+Microservices -> etcd
+Microservices -> Databases
+Microservices -> Uptrace: Report traces, metrics and logs
+Loki -> Microservices: Collect logs
+Grafana -> Loki: Visualize
+Grafana -> Databases: Visualize
+
+Developer -> Netmaker
+Netmaker -> Dev network
+Dev network <-> Microservices
+Dev network <-> Databases
+
+Developer -> SOPS
+SOPS -> GitHub: Encryt secrets
+
+Developer -> Grafana: View
+Developer -> Uptrace: View
+
+EaseProbe -> Developer: Notify
+EaseProbe -> APISIX: Poll
+EaseProbe -> Databases: Poll
+
+Antman -> Developer: Notify
+Antman -> etcd: Watch
+
+GitHub -> CircleCI: Notify
+CircleCI -> Microservices: Build, deploy
+
+User -> Web
+User -> Mobile
+User -> Desktop
+Web -> APISIX
+Mobile -> APISIX
+Desktop -> APISIX
